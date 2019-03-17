@@ -84,17 +84,15 @@ let test_pattern_not_in search text pattern =
   assert (search text pattern = [])
 
 let test_pattern_in search text pattern =
+  let ls = search text pattern in 
+  assert (List.length ls = 2);
   let test_pattern_in_aux e =
   let p' = String.sub text (get_exn e) (String.length pattern) in 
   assert (pattern = p') in
-  List.iter (fun e -> test_pattern_in_aux e) (search text pattern)
-
+  List.iter (fun e -> test_pattern_in_aux e) ls
+ 
 let search_tester search =
   let (s, ps, pn) = generate_string_and_patterns 500 5 in
   List.iter (fun p -> test_pattern_in search s p) ps;
   List.iter (fun p -> test_pattern_not_in search s p) pn;
   true
-
-let%test "Naive Search Works" = search_tester naive_search_all
-
-let%test "Rabin-Karp Search Works" = search_tester rabin_karp_search_all
