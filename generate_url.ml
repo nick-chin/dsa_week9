@@ -107,12 +107,7 @@ module StringHashing = struct
   type t = string
   let hash1 s = Hashtbl.hash s
   let hash2 s =
-    let rec rev_string s ls i =
-      if List.length ls = String.length s
-      then String.concat ""
-      else rev_string s ((String.sub s i 1) :: ls) (i + 1)
-    in
-    Hashtbl.hash @@ rev_string s [] 0
+    Hashtbl.hash @@ String.mapi (fun i c -> if i mod 2 = 0 then c else ' ') s
   let hash3 s = Hashtbl.hash @@ String.concat "" [s; s]
   let hash_functions = [hash1; hash2; hash3]
 end
@@ -123,13 +118,8 @@ module SF = BloomFilterImpl(StringHashing);;
 open SF;;
 
 
-module type Generator =
-  sig
-    val filter : t
-    val generate_fresh_url : unit -> string
-  end
 
-module URLGenerator : Generator = struct
+module URLGenerator = struct
   module SF = BloomFilterImpl(StringHashing)
   open SF
 
