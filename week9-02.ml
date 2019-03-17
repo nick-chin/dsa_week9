@@ -16,7 +16,7 @@ else
     if !j = m then res := Some !k :: !res;
     k := !k + 1
   done;
-  !res
+  List.rev !res
 
 let rk_hash text =
   let h = ref 0 in
@@ -47,7 +47,7 @@ let rabin_karp_search_all text pattern =
           rolling_hash := !rolling_hash - c1 + c2);
       i := !i + 1
     done;
-    !res
+    List.rev !res
 
 let generate_words length num =
   let random_ascii_char _ = 
@@ -73,7 +73,8 @@ let generate_string_and_patterns n m =
     List.filter (fun p -> not (List.mem p ps_in)) @@
     generate_words n m in
   let s = String.concat "" (List.rev ps_in) in
-  (s, ps_in, ps_not_in)
+  let s' = String.concat "" (s :: List.rev ps_in) in
+  (s', ps_in, ps_not_in)
 
 let get_exn o = match o with
 | Some e -> e
@@ -88,13 +89,8 @@ let test_pattern_in search text pattern =
   assert (pattern = p') in
   List.iter (fun e -> test_pattern_in_aux e) (search text pattern)
 
-let big = "abcdefghijklmnopeqrstuvabcsrtdsdqewgdcvaegbdweffwdajbjrag"
-
-let patterns = ["dsd"; "jrag"; "abc"]
-
 let search_tester search =
   let (s, ps, pn) = generate_string_and_patterns 500 5 in
-  List.iter (fun p -> test_pattern_in search big p) patterns;
   List.iter (fun p -> test_pattern_in search s p) ps;
   List.iter (fun p -> test_pattern_not_in search s p) pn;
   true
