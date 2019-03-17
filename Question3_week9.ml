@@ -1,8 +1,7 @@
 
-(*Required Helper functions from Class*)
+(*Required Helper functions from Class - Program at the very end of this file*)
 
 let out = ref false
-
 
 open String
 
@@ -286,7 +285,7 @@ let cyclic_rotation str1 str2 = if str1 = str2 then false else let res1 = search
      | None -> false;;
 
 
-cyclic_rotation  "yalenus" "lenusya";;
+(*cyclic_rotation  "yalenus" "lenusya";;*)
 
 (*Test*)
 
@@ -299,8 +298,18 @@ let truetest1 func = let str_list = generate_words 5 10 in
  let word_in_reverse = String.concat "" (flip str_list) in
  func word word_in_reverse;;
 
-let%test "Should return true for cyclic rotation" =
-  truetest1 cyclic_rotation = true;;
+
+let falsetest1 func =  let str_list = generate_words 5 10 in
+ let word = String.concat "" str_list in
+ let word2_list = generate_words 5 10  in
+ let not_possible_word = String.concat "" (List.filter (fun p -> not (List.mem p str_list)) @@ word2_list) in
+  func word not_possible_word;;
+
+let test_success = not (falsetest1 cyclic_rotation) && truetest1 cyclic_rotation;;
+
+
+
+
 
 
 
