@@ -1,4 +1,4 @@
-let generate_words length num =
+let generate_word length =
   let random_ascii_char _ = 
     let rnd = (Random.int 26) + 97 in
     Char.chr rnd
@@ -11,12 +11,7 @@ let generate_words length num =
     done;
     Buffer.contents buf
   in
-  let acc = ref [] in
-  for _i = 0 to num - 1 do
-    acc := (random_string ()) :: ! acc
-  done;
-  !acc
-
+  random_string();;
 
 
 module ArrayPrinter = functor (P : sig
@@ -114,10 +109,6 @@ end
 
 
 
-module SF = BloomFilterImpl(StringHashing);;
-open SF;;
-
-
 
 module URLGenerator = struct
   module SF = BloomFilterImpl(StringHashing)
@@ -128,9 +119,9 @@ module URLGenerator = struct
     f
 
   let generate_fresh_url _ =
-    let url = ref (List.hd (generate_words 6 1)) in
+    let url = ref (generate_word 10) in
     while contains filter !url do
-      url := List.hd (generate_words 6 1)
+      url := generate_word 10
     done;
     insert filter !url;
     String.concat "" ["url.com/"; !url]
@@ -139,7 +130,14 @@ end
 
 module Gen = URLGenerator;;
 open Gen;;
+
 Gen.filter;;
-print_filter Gen.filter;;
+Gen.SF.print_filter Gen.filter;;
 Gen.generate_fresh_url ();;
-contains Gen.filter "obghta";;
+Gen.SF.print_filter Gen.filter;;
+Gen.SF.contains Gen.filter "obghtagajq";;
+Gen.generate_fresh_url ();;
+Gen.generate_fresh_url ();;
+Gen.generate_fresh_url ();;
+Gen.generate_fresh_url ();;
+Gen.SF.print_filter Gen.filter;;
