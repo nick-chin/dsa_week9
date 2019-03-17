@@ -3,6 +3,7 @@
 
 let out = ref false
 
+
 open String
 
 let naive_search_one_loop text pattern = 
@@ -305,7 +306,14 @@ let falsetest1 func =  let str_list = generate_words 5 10 in
  let not_possible_word = String.concat "" (List.filter (fun p -> not (List.mem p str_list)) @@ word2_list) in
   func word not_possible_word;;
 
-let test_success = not (falsetest1 cyclic_rotation) && truetest1 cyclic_rotation;;
+let test_success = assert (not (falsetest1 cyclic_rotation) && truetest1 cyclic_rotation);
+true;;
+
+
+
+
+
+
 
 
 
