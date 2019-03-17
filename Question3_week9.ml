@@ -1,20 +1,8 @@
-(*
-This file is part of teaching material of Yale-NUS College module
-"YSC2229: Introductory Data Structures and Algorithms"
-It has been adopted from the blog article:
-http://gallium.inria.fr/blog/kmp/
-Copyright (c) François Pottier
-*)
 
-(****************************************************)
-(*               Flag for output printing           *)
-(****************************************************)
+(*Required Helper functions from Class*)
 
 let out = ref false
 
-(****************************************************)
-(* Reshaping the naive algorithm with a single loop *)
-(****************************************************)
 
 open String
 
@@ -44,15 +32,9 @@ let naive_search_one_loop text pattern =
     !res
 
 
-
-(****************************************************)
-(*                Making it recursive               *)
-(****************************************************)
-
 type search_result = 
   | Found of int
   | Interrupted of int
-
 
 
 let global_search search text pattern = 
@@ -76,10 +58,6 @@ let search_rec =
   in
   global_search search
 
-(*****************************************************)
-(*             Instrument with invariant             *)
-(*****************************************************)
-
 
 let search_inv = 
   let rec search pattern m text n j k =
@@ -97,24 +75,6 @@ let search_inv =
       search pattern m text n 0 (k - j + 1)
   in
   global_search search
-
-(**
-Search within a long text can be split up as a sequential composition of two searches.
-Here's an equivalence for k <= l <= n
-search pattern m text n j k
-is equivalent to 
- let result = search pattern m text l j k in
-  match result with
-  | Found _ ->
-      result
-  | Interrupted j' ->
-      search pattern m text n j' l
-As the interruption happened when we hit the imposed right end of the text (i.e., l).
-**)
-
-(*****************************************************)
-(*    Fast-Forwarding Search using Interrupt Index   *)
-(*****************************************************)
 
 
 open Printf
@@ -169,10 +129,6 @@ let search_with_shift_print =
   global_search search
 
 
-(*****************************************************)
-(*        Extracting the Interrupt Index             *)
-(*****************************************************)
-
 
 let assertInterrupted = function
   | Found _       -> assert false
@@ -196,11 +152,6 @@ let search_assert =
   global_search search
 
 
-(*****************************************************)
-(*        Exploiting the Prefix Equality             *)
-(*****************************************************)
-
-
 let search_via_pattern =
   let rec search pattern m text n j k =
   if j = m then
@@ -220,10 +171,6 @@ let search_via_pattern =
   in 
   global_search search
 
-(*****************************************************)
-(*        Tabulating the interrupt indices           *)
-(*****************************************************)
-
 
 let rec loop table pattern m text n j k =
   if j = m then
@@ -237,10 +184,6 @@ let rec loop table pattern m text n j k =
   else
     loop table pattern m text n table.(j) k
 
-
-(****************************************************)
-(*              Initialising the table              *)
-(****************************************************)
 
 let search_with_inefficient_init =
 
@@ -285,10 +228,6 @@ let search_with_inefficient_init =
 
   global_search loop_search
 
-(****************************************************)  
-(*          Finally, making it efficient            *)  
-(****************************************************)
-
 let search_kmp =
 
   let loop_search pattern _ text n j k = 
@@ -318,17 +257,55 @@ let search_kmp =
 
   global_search loop_search;;
 
+let generate_words length num =
+  let random_ascii_char _ =
+    let rnd = (Random.int 26) + 97 in
+    Char.chr rnd
+  in
+  let random_string _ =
+    let buf = Buffer.create length in
+    for i = 0 to length - 1 do
+      Buffer.add_char buf (random_ascii_char ())
+    done;
+    Buffer.contents buf
+  in
+  let acc = ref [] in
+  for i = 0 to num - 1 do
+    acc := (random_string ()) :: ! acc
+  done;
+  !acc;;
+
+
+(* Our answer for Question 3*)
 
 let double_concat str = String.concat str [""; str];;
 
-let cyc_rot str1 str2 =  let res1 = search_kmp (double_concat str1) str2 in
+let cyclic_rotation str1 str2 = if str1 = str2 then false else let res1 = search_kmp (double_concat str1) str2 in
      match res1 with
-     |Some x -> true
+     |Some x -> if (String.length str2 = String.length str1) then true else false
      | None -> false;;
 
 
+cyclic_rotation  "yalenus" "lenusya";;
 
-cyc_rot "lenusya" "yalenus";;
+(*Test*)
 
-  
+
+let flip lst = let head = List.hd (List.rev lst) in
+head :: (List.rev (List.tl (List.rev lst)));;
+
+let truetest1 func = let str_list = generate_words 5 10 in
+ let word = String.concat "" str_list in
+ let word_in_reverse = String.concat "" (flip str_list) in
+ func word word_in_reverse;;
+
+let%test "Should return true for cyclic rotation" =
+  truetest1 cyclic_rotation = true;;
+
+
+
+
+
+
+
 
