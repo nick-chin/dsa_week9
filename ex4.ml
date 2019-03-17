@@ -10,10 +10,10 @@ let left_right_search text pattern =
   let res = ref None in
   let stop = ref false in
   while !k < n && not !stop do
-    (*  Printf.printf "k = %d; j = %d\n" !k !j; *)
-    if !j = 0
+    (* Printf.printf "k = %d; j = %d\n" !k !j; *)
+    if !j < 0
     then
-      (res := Some !k;
+      (res := Some (!k+1);
        stop := true)
     else if pattern.[!j] <> text.[!k]
     then
@@ -28,6 +28,8 @@ let left_right_search text pattern =
   !res;;
 
 (* Optimisations *)
+
+(* Improvements like the Rabin-Karp and KMP? *)
 
 (* Testing *)
 let get_exn o = match o with
