@@ -342,3 +342,52 @@ let string_cycle_rotate s =
   else
     (let tl = String.sub s (len/2) (len/2) in
      String.concat "" [tl; hd]);;
+
+let x = ["abcde"; "eds"; "jidksaf"];;
+
+let generate_words length num =
+  let random_ascii_char _ = 
+    let rnd = (Random.int 26) + 97 in
+    Char.chr rnd
+  in
+  let random_string _ = 
+    let buf = Buffer.create length in
+    for _i = 0 to length - 1 do
+      Buffer.add_char buf
+        (random_ascii_char ())
+    done;
+    Buffer.contents buf
+  in
+  let acc = ref [] in
+  for _i = 0 to num - 1 do
+    acc := (random_string ()) :: ! acc
+  done;
+  !acc;;
+
+(*
+let generate_string_cycle_rotation n m =
+  let words = generate_words n m in
+  let cycled_words = List.map string_cycle_rotate words in
+  let not_rotations =
+    List.filter (fun non_rotations -> not (List.mem non_rotations words)) @@
+      generate_words n m in
+  (words, cycled_words, not_rotations);;
+*)
+
+
+let test_cycle n m =
+  let words = ref (generate_words n m) in
+  let rot_words = ref (List.map string_cycle_rotate !words) in
+  let not_rot =
+    ref (List.filter (fun non_rotations -> not (List.mem non_rotations !words)) @@
+           generate_words n m) in
+  for i = 0 to m - 2 do
+    assert ((cyc_rot (List.hd !words) (List.hd !rot_words)) &&
+         (not (cyc_rot (List.hd !words) (List.hd !not_rot))));
+    words := List.tl !words;
+    rot_words := List.tl !rot_words;
+    not_rot := List.tl !not_rot;
+  done;
+  assert ((cyc_rot (List.hd !words) (List.hd !rot_words)) &&
+            (not (cyc_rot (List.hd !words) (List.hd !not_rot))));
+  true;;
