@@ -330,5 +330,15 @@ let cyc_rot str1 str2 =  let res1 = search_kmp (double_concat str1) str2 in
 
 cyc_rot "lenusya" "yalenus";;
 
-  
 
+let string_cycle_rotate s =
+  let len = String.length s in
+  let is_odd = len mod 2 == 1 in
+  let hd = String.sub s 0 (len/2) in
+  if is_odd
+  then
+    (let tl = String.sub s (len/2) (len/2 + 1) in
+     String.concat "" [tl; hd])
+  else
+    (let tl = String.sub s (len/2) (len/2) in
+     String.concat "" [tl; hd]);;
